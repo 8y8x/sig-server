@@ -6,6 +6,7 @@ const readline = require("readline");
 
 const DefaultCommands = require("../src/commands/DefaultCommands");
 const DefaultProtocols = [
+    require("../src/protocols/SigmallyProtocol"),
     require("../src/protocols/LegacyProtocol"),
     require("../src/protocols/ModernProtocol"),
 ];

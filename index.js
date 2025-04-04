@@ -8,6 +8,7 @@ module.exports = {
     base: {
         commands: require("./src/commands/DefaultCommands"),
         protocols: [
+            require("./src/protocols/SigmallyProtocol"),
             require("./src/protocols/LegacyProtocol"),
             require("./src/protocols/ModernProtocol")
         ],
