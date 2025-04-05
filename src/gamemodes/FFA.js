@@ -11,7 +11,8 @@ function getLeaderboardData(player, requesting, index) {
         name: player.leaderboardName,
         highlighted: requesting.id === player.id,
         cellId: player.ownedCells[0].id,
-        position: 1 + index
+        position: 1 + index,
+        sub: player.sub,
     };
 }
 
@@ -28,20 +29,21 @@ class FFA extends Gamemode {
 
     /**
      * @param {Player} player
-     * @param {string} name
-     * @param {string} skin
      */
-    onPlayerSpawnRequest(player, name, skin) {
+    onPlayerSpawnRequest(player) {
         if (player.state === 0 || !player.hasWorld) return;
         const size = player.router.type === "minion" ?
              this.handle.settings.minionSpawnSize :
              this.handle.settings.playerSpawnSize;
         const spawnInfo = player.world.getPlayerSpawn(size);
         const color = spawnInfo.color || Misc.randomColor();
+        const name = player.router.spawningAttributes.name || player.leaderboardName || '';
         player.cellName = player.chatName = player.leaderboardName = name;
-        player.cellSkin = skin;
+        player.cellSkin = player.router.spawningAttributes.skin || '';
         player.chatColor = player.cellColor = color;
-        player.world.spawnPlayer(player, spawnInfo.pos, size, name, null);
+        player.clan = player.router.spawningAttributes.clan || '';
+        player.sub = !!player.router.spawningAttributes.sub;
+        player.world.spawnPlayer(player, spawnInfo.pos, size);
     }
 
     /**

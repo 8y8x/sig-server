@@ -73,6 +73,7 @@ class SigmallyProtocol extends Protocol {
                     skin: body.skin.substring(0, 20),
                     spectating: body.state ==/*=*/ 2,
                     clan: body.clan || "",
+                    showClanmates: !!body.showClanmates,
                     sub: !!body.sub,
                 };
                 break;
@@ -221,7 +222,7 @@ class SigmallyProtocol extends Protocol {
                     writer.writeZTStringUTF8(item.name);
 
                     writer.writeUInt32(selfData?.position ?? 0);
-                    writer.writeUInt32(0); // TODO: sub
+                    writer.writeUInt32(item.sub); // TODO: sub
                 }
                 break;
 
@@ -324,8 +325,8 @@ function writeCellData6(writer, source, cell, includeType, includeSize, includeP
 
     writer.writeUInt8(includeType ? 0 : 1); // isUpdate
     writer.writeUInt8(cell.type !== -1 ? 1 : 0); // isPlayer
-    writer.writeUInt8(0); // TODO sub
-    writer.writeZTStringUTF8(''); // TODO clan
+    writer.writeUInt8(cell.owner?.sub ? 1 : 0);
+    writer.writeZTStringUTF8(cell.owner?.clan || '');
 
     if (includeColor) writer.writeColor(cell.color);
     if (includeSkin) writer.writeZTStringUTF8(cell.skin);

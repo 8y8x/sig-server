@@ -34,6 +34,7 @@ interface FFALeaderboardEntry {
     highlighted: boolean;
     cellId: number;
     position: number;
+    sub: boolean;
 }
 interface PieLeaderboardEntry {
     weight: number;

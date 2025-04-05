@@ -133,6 +133,17 @@ class Player {
             const cell = this.ownedCells[i];
             visibleCells[cell.id] = cell;
         }
+
+        if (this.clan !== "") {
+            for (let i = 0, l = this.world.players.length; i < l; i++) {
+                const player = this.world.players[i];
+                if (player.clan === this.clan) {
+                    const firstCell = player.ownedCells[0];
+                    if (firstCell) visibleCells[firstCell.id] = firstCell;
+                }
+            }
+        }
+
         this.world.finder.search(this.viewArea, (cell) => visibleCells[cell.id] = cell);
     }
 

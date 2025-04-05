@@ -11,7 +11,7 @@ class Router {
         this.mouseX = 0;
         this.mouseY = 0;
 
-        /** @type {{ name?: string, skin?: string, spectating?: boolean, clan?: string, showClanmates?: boolean } | null} */
+        /** @type {{ name?: string, skin?: string, spectating?: boolean, clan?: string, showClanmates?: boolean, sub?: boolean } | null} */
         this.spawningAttributes = null;
         this.isPressingQ = false;
         this.hasProcessedQ = false;
@@ -78,10 +78,12 @@ class Router {
                     skin = regex[1];
                 }
             }
-            this.listener.handle.gamemode.onPlayerSpawnRequest(this.player, name, skin);
-        } else {
-            this.listener.handle.gamemode.onPlayerSpawnRequest(this.player, this.player.leaderboardName, this.player.cellSkin);
+
+            this.spawningAttributes.name = name;
+            this.spawningAttributes.skin = skin;
         }
+
+        this.listener.handle.gamemode.onPlayerSpawnRequest(this.player);
     }
     /** @virtual */
     onSpectateRequest() {

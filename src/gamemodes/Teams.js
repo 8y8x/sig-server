@@ -72,19 +72,20 @@ class Teams extends Gamemode {
 
     /**
      * @param {Player} player
-     * @param {string} name
-     * @param {string} skin
      */
-    onPlayerSpawnRequest(player, name, skin) {
+    onPlayerSpawnRequest(player) {
         if (player.state === 0 || !player.hasWorld) return;
         const size = player.router.type === "minion" ?
             this.handle.settings.minionSpawnSize :
             this.handle.settings.playerSpawnSize;
         const pos = player.world.getSafeSpawnPos(size);
         const color = player.router.separateInTeams ? getTeamColor(player.team) : Misc.randomColor();
+        const name = player.router.spawningAttributes.name || player.leaderboardName || '';
         player.cellName = player.chatName = player.leaderboardName = name;
         player.cellSkin = null;
         player.chatColor = player.cellColor = color;
+        player.clan = player.router.spawningAttributes.clan || '';
+        player.sub = !!player.router.spawningAttributes.sub;
         player.world.spawnPlayer(player, pos, size);
     }
 

@@ -59,8 +59,8 @@ class Gamemode {
         if (!player.hasWorld) return;
         player.world.splitPlayer(player);
     }
-    /** @param {Player} player @param {string} name @param {string} skin @abstract */
-    onPlayerSpawnRequest(player, name, skin) {
+    /** @param {Player} player @abstract */
+    onPlayerSpawnRequest(player) {
         throw new Error("Must be overriden");
     }
     /** @param {Player} player @virtual */
