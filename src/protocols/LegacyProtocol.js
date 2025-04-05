@@ -50,6 +50,7 @@ class LegacyProtocol extends Protocol {
         switch (messageId) {
             case 0:
                 // TODO: password
+                if (this.handle.settings.serverPassword) return;
                 this.connection.spawningAttributes = { name: readZTString(reader, this.protocol), spectating: false };
                 break;
             case 1:

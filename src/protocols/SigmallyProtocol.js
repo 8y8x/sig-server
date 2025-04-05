@@ -66,7 +66,10 @@ class SigmallyProtocol extends Protocol {
                 )
                     return void console.log(body), this.connection.close();
 
-                // TODO: password
+                if (this.handle.settings.serverPassword && this.handle.settings.serverPassword !== body.password) {
+                    this.connection.send(Buffer.from([ shuffle[0xb4] ]));
+                    return;
+                }
 
                 this.connection.spawningAttributes = {
                     name: body.name,

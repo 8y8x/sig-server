@@ -369,7 +369,7 @@ class World {
         this.compileStatistics();
         this.handle.gamemode.compileLeaderboard(this);
 
-        if (this.stats.external <= 0 && Object.keys(this.handle.worlds).length > this.settings.worldMinCount)
+        if (this.stats.external <= 0 && Object.keys(this.handle.worlds).length - 1 > this.settings.worldMinCount)
             this.handle.removeWorld(this.id);
     }
 

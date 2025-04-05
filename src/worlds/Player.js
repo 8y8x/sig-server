@@ -97,6 +97,11 @@ class Player {
                 s = this.viewArea.s = Math.pow(Math.min(64 / s, 1), 0.4);
                 this.viewArea.w = 1920 / s / 2 * this.settings.playerViewScaleMult;
                 this.viewArea.h = 1080 / s / 2 * this.settings.playerViewScaleMult;
+
+                if (!this.router.isExternal) {
+                    this.viewArea.w /= 2;
+                    this.viewArea.h /= 2;
+                }
                 break;
             case 1:
                 this.score = NaN;

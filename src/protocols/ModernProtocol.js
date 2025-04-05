@@ -73,7 +73,7 @@ class ModernProtocol extends Protocol {
                     if (reader.length < 13)
                         return void this.fail(1003, "Unexpected message format");
 
-                    // TODO: password
+                    if (this.handle.settings.serverPassword) return;
                     this.connection.spawningAttributes = { name: reader.readZTStringUTF8(), spectating: false };
                 }
                 if (globalFlags & 2) this.connection.spawningAttributes = { spectating: true };
