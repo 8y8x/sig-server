@@ -139,7 +139,7 @@ class Player {
             visibleCells[cell.id] = cell;
         }
 
-        if (this.clan !== "") {
+        if (this.clan !== "" && this.showClanmates) {
             for (let i = 0, l = this.world.players.length; i < l; i++) {
                 const player = this.world.players[i];
                 if (player.clan === this.clan) {
