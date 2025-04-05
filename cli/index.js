@@ -53,6 +53,7 @@ commandStream.once("SIGINT", () => {
     commandStream.close();
     currentHandle.stop();
     process.exitCode = 0;
+    setTimeout(() => void process.exit(0), 1000);
 });
 
 
