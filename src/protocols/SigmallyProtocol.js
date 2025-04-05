@@ -136,11 +136,20 @@ class SigmallyProtocol extends Protocol {
                 const message = reader.readZTStringUTF8();
                 this.connection.onChatMessage(message);
                 break;
+            case 0xbf:
+                // playtime quest
+            case 0xc0:
+                // food quest
+            case 0xd0:
+                // analytics
+                break;
             case 254:
                 if (this.connection.hasPlayer && this.connection.player.hasWorld)
                     this.onStatsRequest();
                 break;
-            default:// return void this.fail(); // TODO
+            default:
+                if (Date.now() - this.connection.connectTime > 5000)
+                    return void this.fail();
         }
     }
 
@@ -225,7 +234,7 @@ class SigmallyProtocol extends Protocol {
                     writer.writeZTStringUTF8(item.name);
 
                     writer.writeUInt32(selfData?.position ?? 0);
-                    writer.writeUInt32(item.sub); // TODO: sub
+                    writer.writeUInt32(item.sub);
                 }
                 break;
 
