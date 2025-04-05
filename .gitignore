@@ -10,3 +10,6 @@ package-lock.json
 # IDE settings
 .vscode
 .vs
+
+# other
+**/.DS_store
