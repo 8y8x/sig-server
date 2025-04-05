@@ -32,9 +32,9 @@ class PlayerBot extends Bot {
 
             let name = names[~~(Math.random() * names.length)] || "Player bot";
             let skin = '';
-            if (name.indexOf("<*>") !== -1) {
+            if (name.indexOf("{*}") !== -1) {
                 skin = skins[~~(Math.random() * skins.length)];
-                name = name.replace("<*>", "");
+                name = name.replace("{*}", "");
             }
 
             this.spawningAttributes = { name, skin, spectating: false, clan: '', showClanmates: false };

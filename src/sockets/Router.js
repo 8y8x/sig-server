@@ -70,7 +70,7 @@ class Router {
         if ('name' in this.spawningAttributes) {
             let name = this.spawningAttributes.name.slice(0, this.settings.playerMaxNameLength);
             /** @type {string} */
-            let skin;
+            let skin = this.spawningAttributes.skin;
             if (this.settings.playerAllowSkinInName) {
                 const regex = /\{(.*)\}(.*)/.exec(name);
                 if (regex !== null) {
