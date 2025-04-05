@@ -11,9 +11,8 @@ class Router {
         this.mouseX = 0;
         this.mouseY = 0;
 
-        /** @type {string=} */
-        this.spawningName = null;
-        this.requestingSpectate = false;
+        /** @type {{ name?: string, skin?: string, spectating?: boolean, clan?: string, showClanmates?: boolean } | null} */
+        this.spawningAttributes = null;
         this.isPressingQ = false;
         this.hasProcessedQ = false;
         this.splitAttempts = 0;
@@ -68,17 +67,21 @@ class Router {
     /** @virtual */
     onSpawnRequest() {
         if (!this.hasPlayer) return;
-        let name = this.spawningName.slice(0, this.settings.playerMaxNameLength);
-        /** @type {string} */
-        let skin;
-        if (this.settings.playerAllowSkinInName) {
-            const regex = /\<(.*)\>(.*)/.exec(name);
-            if (regex !== null) {
-                name = regex[2];
-                skin = regex[1];
+        if ('name' in this.spawningAttributes) {
+            let name = this.spawningAttributes.name.slice(0, this.settings.playerMaxNameLength);
+            /** @type {string} */
+            let skin;
+            if (this.settings.playerAllowSkinInName) {
+                const regex = /\{(.*)\}(.*)/.exec(name);
+                if (regex !== null) {
+                    name = regex[2];
+                    skin = regex[1];
+                }
             }
+            this.listener.handle.gamemode.onPlayerSpawnRequest(this.player, name, skin);
+        } else {
+            this.listener.handle.gamemode.onPlayerSpawnRequest(this.player, this.player.leaderboardName, this.player.cellSkin);
         }
-        this.listener.handle.gamemode.onPlayerSpawnRequest(this.player, name, skin);
     }
     /** @virtual */
     onSpectateRequest() {

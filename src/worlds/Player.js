@@ -28,6 +28,10 @@ class Player {
         /** @type {number} */
         this.chatColor = 0x7F7F7F;
 
+        this.clan = '';
+        this.showClanmates = false;
+        this.sub = false;
+
         /** @type {PlayerState} */
         this.state = -1;
         this.hasWorld = false;

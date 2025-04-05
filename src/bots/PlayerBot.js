@@ -29,12 +29,17 @@ class PlayerBot extends Bot {
         if (player.state === -1) {
             const names = this.listener.settings.worldPlayerBotNames;
             const skins = this.listener.settings.worldPlayerBotSkins;
-            /** @type {string} */
-            this.spawningName = names[~~(Math.random() * names.length)] || "Player bot";
-            if (this.spawningName.indexOf("<*>") !== -1)
-                this.spawningName = this.spawningName.replace("<*>", `<${skins[~~(Math.random() * skins.length)]}>`);
+
+            let name = names[~~(Math.random() * names.length)] || "Player bot";
+            let skin = '';
+            if (name.indexOf("<*>") !== -1) {
+                skin = skins[~~(Math.random() * skins.length)];
+                name = name.replace("<*>", "");
+            }
+
+            this.spawningAttributes = { name, skin, spectating: false, clan: '', showClanmates: false };
             this.onSpawnRequest();
-            this.spawningName = null;
+            this.spawningAttributes = null;
         }
 
         /** @type {PlayerCell} */

@@ -2,6 +2,16 @@ const Protocol = require("./Protocol");
 const Reader = require("../primitives/Reader");
 const Writer = require("../primitives/Writer");
 
+const shuffleArray = [];
+for (let i = 0; i < 256; ++i) shuffleArray.push(i);
+shuffleArray.sort(() => Math.random() - 0.5);
+const shuffle = Buffer.from(shuffleArray);
+
+const unshuffle = Buffer.alloc(256);
+for (let i = 0; i < 256; ++i) {
+    unshuffle[shuffle[i]] = i;
+}
+
 class SigmallyProtocol extends Protocol {
     /**
      * @param {Connection} connection
@@ -9,16 +19,6 @@ class SigmallyProtocol extends Protocol {
     constructor(connection) {
         super(connection);
         this.protocol = NaN;
-
-        const shuffle = [];
-        for (let i = 0; i < 256; ++i) shuffle.push(i);
-        shuffle.sort(() => Math.random() - 0.5);
-        this.shuffle = Buffer.from(shuffle);
-
-        this.unshuffle = Buffer.alloc(256);
-        for (let i = 0; i < 256; ++i) {
-            this.unshuffle[this.shuffle[i]] = i;
-        }
     }
 
     static get type() { return "sigmally"; }
@@ -35,7 +35,7 @@ class SigmallyProtocol extends Protocol {
 
         const writer = new Writer();
         writer.writeZTStringUTF8("SIG 0.0.1");
-        writer.writeBytes(this.shuffle);
+        writer.writeBytes(shuffle);
         this.connection.send(writer.finalize());
 
         return true;
@@ -45,7 +45,7 @@ class SigmallyProtocol extends Protocol {
      * @param {Reader} reader
      */
     onSocketMessage(reader) {
-        const messageId = this.unshuffle[reader.readUInt8()];
+        const messageId = unshuffle[reader.readUInt8()];
         switch (messageId) {
             case 0:
                 if (reader.length < 2)
@@ -59,12 +59,22 @@ class SigmallyProtocol extends Protocol {
                     return void this.fail(1003, "Unexpected message format");
                 }
 
-                if (typeof body.name !== 'string') return void this.connection.close();
-                if (typeof body.skin !== 'string') return void this.connection.close();
+                if (
+                    typeof body.name !== "string"
+                    || typeof body.skin !== "string"
+                    || (body.clan && typeof body.clan !== "string")
+                )
+                    return void console.log(body), this.connection.close();
 
-                this.connection.spawningName = body.name;
-                // TODO: spawningSkin, and literally every other field in here
-                this.connection.requestingSpectate ||= body.state == 2;
+                // TODO: password
+
+                this.connection.spawningAttributes = {
+                    name: body.name,
+                    skin: body.skin.substring(0, 20),
+                    spectating: body.state ==/*=*/ 2,
+                    clan: body.clan || "",
+                    sub: !!body.sub,
+                };
                 break;
             case 16:
                 switch (reader.length) {
@@ -126,7 +136,7 @@ class SigmallyProtocol extends Protocol {
                 if (this.connection.hasPlayer && this.connection.player.hasWorld)
                     this.onStatsRequest();
                 break;
-            default:// return void this.fail();
+            default:// return void this.fail(); // TODO
         }
     }
 
@@ -136,7 +146,7 @@ class SigmallyProtocol extends Protocol {
      */
     onChatMessage(source, message) {
         const writer = new Writer();
-        writer.writeUInt8(this.shuffle[99]);
+        writer.writeUInt8(shuffle[99]);
         writer.writeUInt8(source.isServer * 128);
         writer.writeColor(source.color);
         writer.writeZTStringUTF8(source.name);
@@ -146,7 +156,7 @@ class SigmallyProtocol extends Protocol {
 
     onStatsRequest() {
         const writer = new Writer();
-        writer.writeUInt8(this.shuffle[254]);
+        writer.writeUInt8(shuffle[254]);
         const stats = this.connection.player.world.stats;
         const legacy = {
             mode: stats.gamemode,
@@ -165,7 +175,7 @@ class SigmallyProtocol extends Protocol {
      */
     onNewOwnedCell(cell) {
         const writer = new Writer();
-        writer.writeUInt8(this.shuffle[32]);
+        writer.writeUInt8(shuffle[32]);
         writer.writeUInt32(cell.id);
         this.send(writer.finalize());
     }
@@ -175,7 +185,7 @@ class SigmallyProtocol extends Protocol {
      */
     onNewWorldBounds(range) {
         const writer = new Writer();
-        writer.writeUInt8(this.shuffle[64]);
+        writer.writeUInt8(shuffle[64]);
         writer.writeFloat64(range.x - range.w);
         writer.writeFloat64(range.y - range.h);
         writer.writeFloat64(range.x + range.w);
@@ -185,7 +195,7 @@ class SigmallyProtocol extends Protocol {
 
     onWorldReset() {
         const writer = new Writer();
-        writer.writeUInt8(this.shuffle[18]);
+        writer.writeUInt8(shuffle[18]);
         this.send(writer.finalize());
         if (this.lastLeaderboardType !== null) {
             this.onLeaderboardUpdate(this.lastLeaderboardType, [], null);
@@ -203,7 +213,7 @@ class SigmallyProtocol extends Protocol {
         const writer = new Writer();
         switch (type) {
             case "ffa":
-                writer.writeUInt8(this.shuffle[49]);
+                writer.writeUInt8(shuffle[49]);
                 writer.writeUInt32(data.length);
                 for (let i = 0, l = data.length; i < l; i++) {
                     const item = data[i];
@@ -216,14 +226,14 @@ class SigmallyProtocol extends Protocol {
                 break;
 
             case "pie":
-                writer.writeUInt8(this.shuffle[50]);
+                writer.writeUInt8(shuffle[50]);
                 writer.writeUInt32(data.length);
                 for (let i = 0, l = data.length; i < l; i++)
                     writer.writeFloat32(data[i].weight);
                 break;
 
             case "text":
-                writer.writeUInt8(this.shuffle[48]);
+                writer.writeUInt8(shuffle[48]);
                 writer.writeUInt32(data.length);
                 for (let i = 0, l = data.length; i < l; i++)
                     writer.writeZTStringUTF8(data[i]);
@@ -237,7 +247,7 @@ class SigmallyProtocol extends Protocol {
      */
     onSpectatePosition(viewArea) {
         const writer = new Writer();
-        writer.writeUInt8(this.shuffle[17]);
+        writer.writeUInt8(shuffle[17]);
         writer.writeFloat32(viewArea.x);
         writer.writeFloat32(viewArea.y);
         writer.writeFloat32(viewArea.s);
@@ -254,7 +264,7 @@ class SigmallyProtocol extends Protocol {
     onVisibleCellUpdate(add, upd, eat, del) {
         const source = this.connection.player;
         const writer = new Writer();
-        writer.writeUInt8(this.shuffle[16]);
+        writer.writeUInt8(shuffle[16]);
         let i, l, cell;
 
         l = eat.length;

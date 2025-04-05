@@ -252,8 +252,8 @@ class World {
                     router.onQPress();
                 router.hasProcessedQ = true;
             } else router.hasProcessedQ = false;
-            router.requestingSpectate = false;
-            router.spawningName = null;
+
+            router.spawningAttributes = null;
         }
     }
 
@@ -358,13 +358,10 @@ class World {
                     router.onQPress();
                 router.hasProcessedQ = true;
             } else router.hasProcessedQ = false;
-            if (router.requestingSpectate) {
-                router.onSpectateRequest();
-                router.requestingSpectate = false;
-            }
-            if (router.spawningName !== null) {
-                router.onSpawnRequest();
-                router.spawningName = null;
+            if (router.spawningAttributes !== null) {
+                if (router.spawningAttributes.spectating) router.onSpectateRequest();
+                else router.onSpawnRequest();
+                router.spawningAttributes = null;
             }
             player.updateViewArea();
         }

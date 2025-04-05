@@ -36,9 +36,9 @@ class Minion extends Bot {
             : this.listener.settings.minionName;
         const player = this.player;
         if (player.state === -1 && this.following.player.state === 0) {
-            this.spawningName = name;
+            this.spawningAttributes = { name, skin: '', spectating: false, clan: '', showClanmates: false };
             this.onSpawnRequest();
-            this.spawningName = null;
+            this.spawningAttributes = null;
         } else {
             player.cellName = name;
             player.leaderboardName = name;

@@ -114,12 +114,11 @@ class Connection extends Router {
     update() {
         if (!this.hasPlayer) return;
         if (!this.player.hasWorld) {
-            if (this.spawningName !== null)
+            if (this.spawningAttributes !== null)
                 this.handle.matchmaker.toggleQueued(this);
-            this.spawningName = null;
+            this.spawningAttributes = null;
             this.splitAttempts = 0;
             this.ejectAttempts = 0;
-            this.requestingSpectate = false;
             this.isPressingQ = false;
             this.hasProcessedQ = false;
             return;
