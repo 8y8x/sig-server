@@ -6,7 +6,7 @@ const value = Object.seal({
     listenerMaxConnections: 100,
     listenerMaxClientDormancy: 1000 * 60,
     listenerMaxConnectionsPerIP: 3, // OG: -1
-    listeningPort: 443,
+    listeningPort: 80,
 
     serverFrequency: 25,
     serverName: "A Sigmally Server", // OG: "An unnamed server"
