@@ -333,14 +333,6 @@ class World {
                 this.largestPlayer = player;
         }
 
-        let targetMinions = 0;
-        if (this.handle.settings.worldMinionsPerPlayer > 0 && this.handle.settings.worldMaxMinions > 0) {
-            targetMinions = Math.min(
-                this.handle.settings.worldMinionsPerPlayer,
-                Math.ceil(this.handle.settings.worldMaxMinions / this.stats.playing)
-            );
-        }
-
         for (i = 0, l = this.players.length; i < l; i++) {
             const player = this.players[i];
             player.checkExistence();
@@ -369,13 +361,29 @@ class World {
                 router.spawningAttributes = null;
             }
             player.updateViewArea();
+        }
 
-            if (player.router instanceof Connection) {
-                for (let j = player.router.minions.length - 1; j >= targetMinions; j--)
-                    player.router.minions[j].close();
-                for (let j = player.router.minions.length; j < targetMinions; j++)
-                    new Minion(player.router);
-            }
+        let targetMinions = 0;
+        if (this.handle.settings.worldMinionsPerPlayer > 0 && this.handle.settings.worldMaxMinions > 0) {
+            targetMinions = Math.min(
+                this.handle.settings.worldMinionsPerPlayer,
+                Math.ceil(this.handle.settings.worldMaxMinions / this.stats.playing)
+            );
+        }
+
+        /** @type {Player[]} */
+        const externals = [];
+        for (i = 0, l = this.players.length; i < l; i++) {
+            const player = this.players[i];
+            if (player.router instanceof Connection) externals.push(player);
+        }
+
+        for (i = 0, l = externals.length; i < l; i++) {
+            const player = externals[i];
+            for (let j = player.router.minions.length - 1; j >= targetMinions; j--)
+                player.router.minions[j].close();
+            for (let j = player.router.minions.length; j < targetMinions; j++)
+                new Minion(player.router);
         }
 
         this.compileStatistics();
