@@ -1,4 +1,4 @@
-const poolSize = 1048576;
+const poolSize = 2 ** 22;
 const sharedBuf = Buffer.allocUnsafe(poolSize);
 let offset = 0;
 
