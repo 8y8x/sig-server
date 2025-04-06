@@ -51,10 +51,10 @@ class Protocol {
      */
     onNewOwnedCell(cell) { throw new Error("Must be implemented"); }
     /**
-     * @param {World} world
+     * @param {Rect} range
      * @param {boolean} includeServerInfo
      */
-    onNewWorldBounds(world, includeServerInfo) { throw new Error("Must be implemented"); }
+    onNewWorldBounds(range, includeServerInfo) { throw new Error("Must be implemented"); }
     /**
      * @abstract
      */

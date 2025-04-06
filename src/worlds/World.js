@@ -88,6 +88,8 @@ class World {
      * @param {Rect} range
      */
     setBorder(range) {
+        if (this.border.x === range.x && this.border.y === range.y
+                && this.border.w === range.w && this.border.h === range.h) return;
         this.border.x = range.x;
         this.border.y = range.y;
         this.border.w = range.w;
@@ -100,10 +102,18 @@ class World {
         );
         for (let i = 0, l = this.cells.length; i < l; i++) {
             const cell = this.cells[i];
-            if (cell.type === 0) continue;
             this.finder.insert(cell);
-            if (!fullyIntersects(this.border, cell.range))
+            if (cell.type === 0) continue;
+            if (!fullyIntersects(this.border, cell.range)) {
                 this.removeCell(cell);
+                i--; l--;
+            }
+        }
+
+        for (let i = 0, l = this.players.length; i < l; i++) {
+            const router = this.players[i].router;
+            if (!router.isExternal) continue;
+            router.protocol.onNewWorldBounds(this.border, false);
         }
     }
 
@@ -265,6 +275,8 @@ class World {
         let i;
         /** @type {number} */
         let l;
+
+        this.setBorder({ x: this.settings.worldMapX, y: this.settings.worldMapY, w: this.settings.worldMapW, h: this.settings.worldMapH });
 
         for (i = 0, l = this.cells.length; i < l; i++)
             this.cells[i].onTick();
