@@ -10,7 +10,7 @@ function getLeaderboardData(player, requesting, index) {
     return {
         name: player.leaderboardName,
         highlighted: requesting.id === player.id,
-        cellId: player.ownedCells[0].id,
+        cellId: player.ownedCells[0]?.id ?? 0,
         position: 1 + index,
         sub: player.sub,
     };

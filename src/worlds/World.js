@@ -163,9 +163,6 @@ class World {
         this.handle.gamemode.onPlayerJoinWorld(player, this);
         player.router.onWorldSet();
         this.handle.logger.debug(`player ${player.id} has been added to world ${this.id}`);
-        if (!player.router.isExternal) return;
-        for (let i = 0; i < this.settings.worldMinionsPerPlayer; i++)
-            new Minion(player.router);
     }
     /** @param {Player} player */
     removePlayer(player) {
@@ -336,6 +333,14 @@ class World {
                 this.largestPlayer = player;
         }
 
+        let targetMinions = 0;
+        if (this.handle.settings.worldMinionsPerPlayer > 0 && this.handle.settings.worldMaxMinions > 0) {
+            targetMinions = Math.min(
+                this.handle.settings.worldMinionsPerPlayer,
+                Math.ceil(this.handle.settings.worldMaxMinions / this.stats.playing)
+            );
+        }
+
         for (i = 0, l = this.players.length; i < l; i++) {
             const player = this.players[i];
             player.checkExistence();
@@ -364,6 +369,13 @@ class World {
                 router.spawningAttributes = null;
             }
             player.updateViewArea();
+
+            if (player.router instanceof Connection) {
+                for (let j = player.router.minions.length - 1; j >= targetMinions; j--)
+                    player.router.minions[j].close();
+                for (let j = player.router.minions.length; j < targetMinions; j++)
+                    new Minion(player.router);
+            }
         }
 
         this.compileStatistics();
@@ -656,5 +668,6 @@ class World {
 module.exports = World;
 
 const Cell = require("../cells/Cell");
+const Connection = require("../sockets/Connection");
 const Player = require("./Player");
 const ServerHandle = require("../ServerHandle");

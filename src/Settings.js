@@ -80,6 +80,7 @@ const value = Object.seal({
         "1%George"
     ], // OG: []
     worldMinionsPerPlayer: 0,
+    worldMaxMinions: 120,
     worldMaxPlayers: 50,
     worldMinCount: 0,
     worldMaxCount: 1, // OG: 2
@@ -90,6 +91,7 @@ const value = Object.seal({
     minionSpawnSize: 100, // OG: 32
     minionEnableERTPControls: false,
     minionEnableQBasedControl: true,
+    minionAlwaysSplits: false,
 
     pelletMinSize: 20, // OG: 10
     pelletMaxSize: 20, // OG: 20

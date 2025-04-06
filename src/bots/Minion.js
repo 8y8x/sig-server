@@ -45,6 +45,7 @@ class Minion extends Bot {
         }
         this.mouseX = this.following.minionsFrozen ? this.player.viewArea.x : this.following.mouseX;
         this.mouseY = this.following.minionsFrozen ? this.player.viewArea.y : this.following.mouseY;
+        if (this.handle.settings.minionAlwaysSplits) ++this.splitAttempts;
     }
 }
 
