@@ -42,6 +42,8 @@ class PlayerCell extends Cell {
                 return (other.age < delay || this.age < delay) ? 0 : 1;
             return this.getDefaultEatResult(other);
         }
+        if (!this.world.settings.minionEatsViruses && this.owner.router.type === "minion" && other.type === 2)
+            return 0;
         if (other.type === 4 && other.size > this.size * this.world.settings.worldEatMult) return 3;
         if (other.type === 1) return 2;
         return this.getDefaultEatResult(other);
@@ -88,4 +90,5 @@ class PlayerCell extends Cell {
 
 module.exports = PlayerCell;
 
+const Minion = require("../bots/Minion");
 const Player = require("../worlds/Player");
