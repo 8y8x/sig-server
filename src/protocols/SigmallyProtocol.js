@@ -66,7 +66,8 @@ class SigmallyProtocol extends Protocol {
                 )
                     return void console.log(body), this.connection.close();
 
-                if (this.handle.settings.serverPassword && this.handle.settings.serverPassword !== body.password) {
+                const spectating = body.state ==/*=*/ 2;
+                if (!spectating && this.handle.settings.serverPassword && this.handle.settings.serverPassword !== body.password) {
                     this.connection.send(Buffer.from([ shuffle[0xb4] ]));
                     return;
                 }
@@ -74,7 +75,7 @@ class SigmallyProtocol extends Protocol {
                 this.connection.spawningAttributes = {
                     name: body.name,
                     skin: body.skin.substring(0, 20),
-                    spectating: body.state ==/*=*/ 2,
+                    spectating,
                     clan: body.clan || "",
                     showClanmates: !!body.showClanmates,
                     sub: !!body.sub,
