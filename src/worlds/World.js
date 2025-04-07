@@ -373,7 +373,7 @@ class World {
         if (this.handle.settings.worldMinionsPerPlayer > 0 && this.handle.settings.worldMaxMinions > 0) {
             targetMinions = Math.min(
                 this.handle.settings.worldMinionsPerPlayer,
-                Math.ceil(this.handle.settings.worldMaxMinions / this.stats.playing)
+                Math.ceil(this.handle.settings.worldMaxMinions / this.players.length)
             );
         }
 
