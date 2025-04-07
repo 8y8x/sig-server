@@ -49,6 +49,7 @@ class Player {
         this.visibleCells = { };
         /** @type {{[cellId: string]: Cell}} */
         this.lastVisibleCells = { };
+        this.visibleCellsTick = NaN;
         /** @type {ViewArea} */
         this.viewArea = {
             x: 0,
@@ -128,33 +129,43 @@ class Player {
 
     updateVisibleCells() {
         if (this.world === null) return;
+        if (this.handle.tick === this.visibleCellsTick) return;
+
         delete this.lastVisibleCells;
         this.lastVisibleCells = this.visibleCells;
         let visibleCells = this.visibleCells = { };
-        for (let i = 0, l = this.ownedCells.length; i < l; i++) {
-            const cell = this.ownedCells[i];
-            visibleCells[cell.id] = cell;
-        }
+        this.visibleCellsTick = this.handle.tick;
 
-        if (this.clan !== "" && this.showClanmates) {
-            for (let i = 0, l = this.world.players.length; i < l; i++) {
-                const player = this.world.players[i];
-                if (player.clan === this.clan) {
-                    const firstCell = player.ownedCells[0];
-                    if (firstCell) visibleCells[firstCell.id] = firstCell;
+        if (this.state === 1 && this.world.largestPlayer && this !== this.world.largestPlayer) {
+            this.world.largestPlayer.updateVisibleCells();
+            this.visibleCells = this.world.largestPlayer.visibleCells;
+            // side effect: clanmates won't be visible, but that's a lot of extra complexity to support
+        } else {
+            for (let i = 0, l = this.ownedCells.length; i < l; i++) {
+                const cell = this.ownedCells[i];
+                visibleCells[cell.id] = cell;
+            }
+
+            if (this.clan !== "" && this.showClanmates) {
+                for (let i = 0, l = this.world.players.length; i < l; i++) {
+                    const player = this.world.players[i];
+                    if (player.clan === this.clan) {
+                        const firstCell = player.ownedCells[0];
+                        if (firstCell) visibleCells[firstCell.id] = firstCell;
+                    }
                 }
             }
-        }
 
-        const modifiedViewArea = { ...this.viewArea };
-        if (!this.router.isExternal) {
-            modifiedViewArea.w /= 2;
-            modifiedViewArea.h /= 2;
-            modifiedViewArea.s /= 2;
+            const modifiedViewArea = { ...this.viewArea };
+            if (!this.router.isExternal && this !== this.world.largestPlayer) {
+                modifiedViewArea.w /= 2;
+                modifiedViewArea.h /= 2;
+                modifiedViewArea.s /= 2;
+            }
+            this.world.finder.search(this.world.finder.bitRange(modifiedViewArea), (cell) => {
+                if (intersects(modifiedViewArea, cell.range)) visibleCells[cell.id] = cell;
+            });
         }
-        this.world.finder.search(this.world.finder.bitRange(modifiedViewArea), (cell) => {
-            if (intersects(modifiedViewArea, cell.range)) visibleCells[cell.id] = cell;
-        });
     }
 
     checkExistence() {

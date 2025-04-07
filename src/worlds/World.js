@@ -369,19 +369,19 @@ class World {
             player.updateViewArea();
         }
 
-        let targetMinions = 0;
-        if (this.handle.settings.worldMinionsPerPlayer > 0 && this.handle.settings.worldMaxMinions > 0) {
-            targetMinions = Math.min(
-                this.handle.settings.worldMinionsPerPlayer,
-                Math.ceil(this.handle.settings.worldMaxMinions / this.players.length)
-            );
-        }
-
         /** @type {Player[]} */
         const externals = [];
         for (i = 0, l = this.players.length; i < l; i++) {
             const player = this.players[i];
             if (player.router instanceof Connection) externals.push(player);
+        }
+
+        let targetMinions = 0;
+        if (this.handle.settings.worldMinionsPerPlayer > 0 && this.handle.settings.worldMaxMinions > 0 && externals.length > 0) {
+            targetMinions = Math.min(
+                this.handle.settings.worldMinionsPerPlayer,
+                Math.ceil(this.handle.settings.worldMaxMinions / externals.length)
+            );
         }
 
         for (i = 0, l = externals.length; i < l; i++) {
