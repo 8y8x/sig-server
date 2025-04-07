@@ -49,10 +49,10 @@ module.exports = {
      * @param {Rect} b
      */
     fullyIntersects(a, b) {
-        return a.x - a.w >= b.x + b.w &&
-               a.x + a.w <= b.x - b.w &&
-               a.y - a.h >= b.y + b.h &&
-               a.y + a.h <= b.y - b.h;
+        return a.x - a.w <= b.x - b.w &&
+               b.x + b.w <= a.x + a.w &&
+               a.y - a.h <= b.y - b.h &&
+               b.y + b.h <= a.y + a.h;
     },
     /**
      * @param {Rect} a
@@ -80,13 +80,18 @@ module.exports = {
             r: a.x - a.w > b.x && a.x + a.w > b.x
         };
     },
-
     /**
      * @param {string} a
      */
     filterIPAddress(a) {
         const unmapped = IPv4MappedValidate.exec(a);
         return unmapped ? unmapped[1] : a;
+    },
+    /**
+     * @param {number} x
+     */
+    clampBits(x) {
+        return Math.min(Math.max(x, 0), 31);
     },
 
     version: "1.3.6"

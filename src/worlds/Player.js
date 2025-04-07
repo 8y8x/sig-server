@@ -3,6 +3,8 @@ const ServerHandle = require("../ServerHandle");
 const World = require("./World");
 const Cell = require("../cells/Cell");
 const PlayerCell = require("../cells/PlayerCell");
+const BitGrid = require("../primitives/BitGrid");
+const { intersects } = require("../primitives/Misc");
 
 class Player {
     /**
@@ -149,7 +151,9 @@ class Player {
             }
         }
 
-        this.world.finder.search(this.viewArea, (cell) => visibleCells[cell.id] = cell);
+        this.world.finder.search(this.world.finder.bitRange(this.viewArea), (cell) => {
+            if (intersects(this.viewArea, cell.range)) visibleCells[cell.id] = cell;
+        });
     }
 
     checkExistence() {

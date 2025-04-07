@@ -63,6 +63,13 @@ interface GenCommandTable {
     rows: string[][];
 }
 
+interface BitRange {
+    leftmost: number;
+    rightmost: number;
+    topmost: number;
+    bottommost: number;
+}
+
 declare type LogEventLevel = "DEBUG" | "ACCESS" | "INFO" | "WARN" | "ERROR" | "FATAL";
 declare type LogEvent = (date: Date, level: LogEventLevel, message: string) => void;
 declare type LogMessageData = any[];

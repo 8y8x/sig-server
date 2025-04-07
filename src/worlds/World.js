@@ -1,4 +1,4 @@
-const QuadTree = require("../primitives/QuadTree");
+const BitGrid = require("../primitives/BitGrid");
 
 const Minion = require("../bots/Minion");
 const PlayerBot = require("../bots/PlayerBot");
@@ -27,8 +27,8 @@ class World {
         this.frozen = false;
 
         this._nextCellId = 1;
-        /** @type {Cell[]} */
-        this.cells = [];
+        /** @type {Set<Cell>} */
+        this.cells = new Set();
         /** @type {Cell[]} */
         this.boostingCells = [];
         this.pelletCount = 0;
@@ -47,7 +47,7 @@ class World {
 
         /** @type {Rect} */
         this.border = { x: NaN, y: NaN, w: NaN, h: NaN };
-        /** @type {QuadTree<Cell>} */
+        /** @type {BitGrid<Cell>} */
         this.finder = null;
 
         /**
@@ -80,8 +80,8 @@ class World {
     destroy() {
         while (this.players.length > 0)
             this.removePlayer(this.players[0]);
-        while (this.cells.length > 0)
-            this.removeCell(this.cells[0]);
+        for (const cell of this.cells)
+            this.removeCell(cell);
     }
 
     /**
@@ -94,19 +94,12 @@ class World {
         this.border.y = range.y;
         this.border.w = range.w;
         this.border.h = range.h;
-        if (this.finder !== null) this.finder.destroy();
-        this.finder = new QuadTree(
-            this.border,
-            this.settings.worldFinderMaxLevel,
-            this.settings.worldFinderMaxItems
-        );
-        for (let i = 0, l = this.cells.length; i < l; i++) {
-            const cell = this.cells[i];
+        this.finder = new BitGrid(this.border);
+        for (const cell of this.cells) {
             this.finder.insert(cell);
             if (cell.type === 0) continue;
             if (!fullyIntersects(this.border, cell.range)) {
                 this.removeCell(cell);
-                i--; l--;
             }
         }
 
@@ -126,7 +119,7 @@ class World {
             w: cell.size,
             h: cell.size
         };
-        this.cells.push(cell);
+        this.cells.add(cell);
         this.finder.insert(cell);
         cell.onSpawned();
         this.handle.gamemode.onNewCell(cell);
@@ -160,7 +153,7 @@ class World {
         this.finder.remove(cell);
         delete cell.range;
         this.setCellAsNotBoosting(cell);
-        this.cells.splice(this.cells.indexOf(cell), 1);
+        this.cells.delete(cell);
         cell.exists = false;
     }
 
@@ -201,7 +194,8 @@ class World {
      * @param {Rect} range
      */
     isSafeSpawnPos(range) {
-        return !this.finder.containsAny(range, /** @param {Cell} other */ (item) => item.avoidWhenSpawning);
+        const bitRange = this.finder.bitRange(range);
+        return !this.finder.containsAny(bitRange, /** @param {Cell} other */ (item) => item.avoidWhenSpawning);
     }
     /**
      * @param {number} cellSize
@@ -278,8 +272,8 @@ class World {
 
         this.setBorder({ x: this.settings.worldMapX, y: this.settings.worldMapY, w: this.settings.worldMapW, h: this.settings.worldMapH });
 
-        for (i = 0, l = this.cells.length; i < l; i++)
-            this.cells[i].onTick();
+        for (const cell of this.cells)
+            cell.onTick();
 
         while (this.pelletCount < this.settings.pelletCount) {
             const pos = this.getSafeSpawnPos(this.settings.pelletMinSize);
@@ -302,7 +296,7 @@ class World {
         for (i = 0; i < l; i++) {
             const cell = this.boostingCells[i];
             if (cell.type !== 2 && cell.type !== 3) continue;
-            this.finder.search(cell.range, (other) => {
+            this.finder.search(cell.bitRange, (other) => {
                 if (cell.id === other.id) return;
                 switch (cell.getEatResult(other)) {
                     case 1: rigid.push(cell, other); break;
@@ -323,7 +317,7 @@ class World {
 
         for (i = 0, l = this.playerCells.length; i < l; i++) {
             const cell = this.playerCells[i];
-            this.finder.search(cell.range, (other) => {
+            this.finder.search(cell.bitRange, (other) => {
                 if (cell.id === other.id) return;
                 switch (cell.getEatResult(other)) {
                     case 1: rigid.push(cell, other); break;

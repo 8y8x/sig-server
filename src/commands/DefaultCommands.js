@@ -345,7 +345,7 @@ module.exports = (commands, chatCommands) => {
                 logger.print(`players: ${Object.keys(handle.players).length}`);
                 for (let id in handle.worlds) {
                     const world = handle.worlds[id], stats = world.stats,
-                        cells = [ world.cells.length, world.playerCells.length, world.pelletCount, world.virusCount, world.ejectedCells.length, world.mothercellCount],
+                        cells = [ world.cells.size, world.playerCells.length, world.pelletCount, world.virusCount, world.ejectedCells.length, world.mothercellCount],
                         statsF = [ stats.external, stats.internal, stats.limit, stats.playing, stats.spectating ];
                     logger.print(`world ${id}: ${cells[0]} cells - ${cells[1]}P/${cells[2]}p/${cells[3]}v/${cells[4]}e/${cells[5]}m`);
                     logger.print(`         ${statsF[0]} / ${statsF[1]} / ${statsF[2]} players - ${statsF[3]}p/${statsF[4]}s`);
