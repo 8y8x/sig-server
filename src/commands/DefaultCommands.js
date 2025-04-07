@@ -740,6 +740,8 @@ module.exports = (commands, chatCommands) => {
                     return void chat.directMessage(null, context, "you don't have a player associated with yourself");
                 if (!context.player.hasWorld)
                     return void chat.directMessage(null, context, "you're not in a world");
+                if (context.player.score >= 5500)
+                    return void chat.directMessage(null, context, "you have >5500 score");
                 context.player.world.removePlayer(context.player);
             }
         }),

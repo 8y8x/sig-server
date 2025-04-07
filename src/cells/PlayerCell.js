@@ -31,6 +31,15 @@ class PlayerCell extends Cell {
      * @returns {CellEatResult}
      */
     getEatResult(other) {
+        if (other.type === 1) return 2;
+        if (this.owner.router.type === "minion") {
+            if (!this.world.settings.minionEatsViruses && other.type === 2)
+                return 0;
+            if (!this.world.settings.minionEatsPlayers && other.type === 0 && other.owner.router.type !== "minion")
+                return 0;
+            if (!this.world.settings.minionEatsEjects && other.type === 3)
+                return 0;
+        }
         if (other.type === 0) {
             const delay = this.world.settings.playerNoCollideDelay;
             if (other.owner.id === this.owner.id) {
@@ -42,10 +51,7 @@ class PlayerCell extends Cell {
                 return (other.age < delay || this.age < delay) ? 0 : 1;
             return this.getDefaultEatResult(other);
         }
-        if (!this.world.settings.minionEatsViruses && this.owner.router.type === "minion" && other.type === 2)
-            return 0;
         if (other.type === 4 && other.size > this.size * this.world.settings.worldEatMult) return 3;
-        if (other.type === 1) return 2;
         return this.getDefaultEatResult(other);
     }
     /**

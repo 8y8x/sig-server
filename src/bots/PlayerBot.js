@@ -126,9 +126,15 @@ class PlayerBot extends Bot {
             this.splitAttempts++;
             this.splitCooldownTicks = 25;
         } else {
-            const d = Math.max(1, Math.sqrt(mouseX * mouseX + mouseY * mouseY));
-            this.mouseX = cell.x + mouseX / d * player.viewArea.w;
-            this.mouseY = cell.y + mouseY / d * player.viewArea.h;
+            const d = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
+            if (d >= 0.001) {
+                this.mouseX = cell.x + mouseX / d * player.viewArea.w;
+                this.mouseY = cell.y + mouseY / d * player.viewArea.h;
+            } else {
+                // go to the middle of the map if nothing is visible nearby
+                this.mouseX = 0;
+                this.mouseY = 0;
+            }
         }
     }
 

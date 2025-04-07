@@ -93,6 +93,8 @@ const value = Object.seal({
     minionEnableQBasedControl: true,
     minionAlwaysSplits: false,
     minionEatsViruses: true,
+    minionEatsEjects: true,
+    minionEatsPlayers: true,
 
     pelletMinSize: 20, // OG: 10
     pelletMaxSize: 20, // OG: 20

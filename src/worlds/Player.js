@@ -99,11 +99,6 @@ class Player {
                 s = this.viewArea.s = Math.pow(Math.min(64 / s, 1), 0.4);
                 this.viewArea.w = 1920 / s / 2 * this.settings.playerViewScaleMult;
                 this.viewArea.h = 1080 / s / 2 * this.settings.playerViewScaleMult;
-
-                if (!this.router.isExternal) {
-                    this.viewArea.w /= 2;
-                    this.viewArea.h /= 2;
-                }
                 break;
             case 1:
                 this.score = NaN;
@@ -151,8 +146,14 @@ class Player {
             }
         }
 
-        this.world.finder.search(this.world.finder.bitRange(this.viewArea), (cell) => {
-            if (intersects(this.viewArea, cell.range)) visibleCells[cell.id] = cell;
+        const modifiedViewArea = { ...this.viewArea };
+        if (!this.router.isExternal) {
+            modifiedViewArea.w /= 2;
+            modifiedViewArea.h /= 2;
+            modifiedViewArea.s /= 2;
+        }
+        this.world.finder.search(this.world.finder.bitRange(modifiedViewArea), (cell) => {
+            if (intersects(modifiedViewArea, cell.range)) visibleCells[cell.id] = cell;
         });
     }
 
