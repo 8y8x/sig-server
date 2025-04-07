@@ -108,10 +108,10 @@ class BitGrid {
 		const { leftmost, rightmost, topmost, bottommost } = bitRange;
 		for (let x = leftmost; x <= rightmost; x++) {
 			for (let y = topmost; y <= bottommost; y++) {
-				for (const item of this.tiles[y * 32 + x]) {
+				for (const item of this.tiles[y * 32 + x].values()) {
 					// don't process items more than once
 					if ((leftmost <= item.bitRange.leftmost && item.bitRange.leftmost < x)
-							|| (topmost <= item.bitRange.topmost && item.bitRange.topmost < y)) return;
+							|| (topmost <= item.bitRange.topmost && item.bitRange.topmost < y)) continue;
 					callback(item);
 				}
 			}
