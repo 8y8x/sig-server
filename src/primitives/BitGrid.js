@@ -119,15 +119,15 @@ class BitGrid {
 	}
 
 	/**
-	 * @param {BitRange} bitRange
+	 * @param {Range} range
 	 * @param {(item: T) => boolean} selector
 	 */
-	containsAny(bitRange, selector) {
-		const { leftmost, rightmost, topmost, bottommost } = bitRange;
+	containsAny(range, selector) {
+		const { leftmost, rightmost, topmost, bottommost } = this.bitRange(range);
 		for (let x = leftmost; x <= rightmost; x++) {
 			for (let y = topmost; y <= bottommost; y++) {
 				for (const item of this.tiles[y * 32 + x].values()) {
-					if (selector(item)) return true;
+					if (intersects(item.range, range) && (!selector || selector(item))) return true;
 				}
 			}
 		}
