@@ -158,13 +158,25 @@ class Player {
 
             const modifiedViewArea = { ...this.viewArea };
             if (!this.router.isExternal && this !== this.world.largestPlayer) {
-                modifiedViewArea.w /= 1.5;
-                modifiedViewArea.h /= 1.5;
-                modifiedViewArea.s /= 1.5;
+                // PlayerBots should use a heavily reduced FOV
+                modifiedViewArea.w /= 2;
+                modifiedViewArea.h /= 2;
+                modifiedViewArea.s /= 2;
             }
+            let anyPellets = false;
             this.world.finder.search(this.world.finder.bitRange(modifiedViewArea), (cell) => {
-                if (intersects(modifiedViewArea, cell.range)) visibleCells[cell.id] = cell;
+                if (intersects(modifiedViewArea, cell.range)) {
+                    visibleCells[cell.id] = cell;
+                    anyPellets ||= cell.type === 1;
+                }
             });
+
+            if (!anyPellets && !this.router.isExternal && this !== this.world.largestPlayer) {
+                // if PlayerBots can't find any nearby pellets, it's probably strayed off the wrong path
+                this.world.finder.search(this.world.finder.bitRange(this.viewArea), (cell) => {
+                    if (intersects(modifiedViewArea, cell.range)) visibleCells[cell.id] = cell;
+                });
+            }
         }
     }
 
