@@ -138,7 +138,7 @@ class Connection extends Router {
             const cell = lastVisible[id];
             if (visible.hasOwnProperty(id)) continue;
             if (cell.eatenBy !== null) eat.push(cell);
-            del.push(cell);
+            if (this.protocol.type !== 'sigmally' || cell.eatenBy === null) del.push(cell);
         }
 
         if (player.state === 1 || player.state === 2)
