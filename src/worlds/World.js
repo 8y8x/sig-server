@@ -170,7 +170,6 @@ class World {
         this.worldChat.add(player.router);
         this.handle.gamemode.onPlayerJoinWorld(player, this);
         player.router.onWorldSet();
-        this.handle.logger.debug(`player ${player.id} has been added to world ${this.id}`);
     }
     /** @param {Player} player */
     removePlayer(player) {
@@ -182,7 +181,6 @@ class World {
         while (player.ownedCells.length > 0)
             this.removeCell(player.ownedCells[0]);
         player.router.onWorldReset();
-        this.handle.logger.debug(`player ${player.id} has been removed from world ${this.id}`);
     }
 
     /**
