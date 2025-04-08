@@ -372,27 +372,34 @@ class World {
             player.updateViewArea();
         }
 
-        /** @type {Player[]} */
-        const externals = [];
+        let playing = 0;
         for (i = 0, l = this.players.length; i < l; i++) {
             const player = this.players[i];
-            if (player.router instanceof Connection) externals.push(player);
+            if (player.router instanceof Connection && (player.state === 0 || player.state === -1)) {
+                ++playing;
+            }
         }
 
         let targetMinions = 0;
-        if (this.handle.settings.worldMinionsPerPlayer > 0 && this.handle.settings.worldMaxMinions > 0 && externals.length > 0) {
+        if (this.handle.settings.worldMinionsPerPlayer > 0 && this.handle.settings.worldMaxMinions > 0 && playing > 0) {
             targetMinions = Math.min(
                 this.handle.settings.worldMinionsPerPlayer,
-                Math.ceil(this.handle.settings.worldMaxMinions / externals.length)
+                Math.ceil(this.handle.settings.worldMaxMinions / playing)
             );
         }
 
-        for (i = 0, l = externals.length; i < l; i++) {
-            const player = externals[i];
-            for (let j = player.router.minions.length - 1; j >= targetMinions; j--)
-                player.router.minions[j].close();
-            for (let j = player.router.minions.length; j < targetMinions; j++)
-                new Minion(player.router);
+        for (i = 0, l = this.players.length; i < l; i++) {
+            const player = this.players[i];
+            if (!(player.router instanceof Connection)) continue;
+
+            if (player.state === 0 || player.state === -1) {
+                for (let j = player.router.minions.length - 1; j >= targetMinions; j--)
+                    player.router.minions[j].close();
+                for (let j = player.router.minions.length; j < targetMinions; j++)
+                    new Minion(player.router);
+            } else {
+                while (player.router.minions.length > 0) player.router.minions[0].close();
+            }
         }
 
         this.compileStatistics();
