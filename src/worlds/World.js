@@ -65,6 +65,11 @@ class World {
             uptime: NaN
         };
 
+        /** @type {Cell[]} */
+        this.eat = [];
+        /** @type {Cell[]} */
+        this.rigid = [];
+
         this.setBorder({ x: this.settings.worldMapX, y: this.settings.worldMapY, w: this.settings.worldMapW, h: this.settings.worldMapH });
     }
 
@@ -261,10 +266,6 @@ class World {
     liveUpdate() {
         this.handle.gamemode.onWorldTick(this);
 
-        /** @type {Cell[]} */
-        const eat = [];
-        /** @type {Cell[]} */
-        const rigid = [];
         /** @type {number} */
         let i;
         /** @type {number} */
@@ -293,15 +294,17 @@ class World {
             else i++;
         }
 
+        let eatL = 0;
+        let rigidL = 0;
         for (i = 0; i < l; i++) {
             const cell = this.boostingCells[i];
             if (cell.type !== 2 && cell.type !== 3) continue;
             this.finder.search(cell.bitRange, (other) => {
                 if (cell.id === other.id) return;
                 switch (cell.getEatResult(other)) {
-                    case 1: rigid.push(cell, other); break;
-                    case 2: eat.push(cell, other); break;
-                    case 3: eat.push(other, cell); break;
+                    case 1: this.rigid[rigidL++] = cell; this.rigid[rigidL++] = other; break;
+                    case 2: this.eat[eatL++] = cell; this.eat[eatL++] = other; break;
+                    case 3: this.eat[eatL++] = other; this.eat[eatL++] = cell; break;
                 }
             });
         }
@@ -320,17 +323,17 @@ class World {
             this.finder.search(cell.bitRange, (other) => {
                 if (cell.id === other.id) return;
                 switch (cell.getEatResult(other)) {
-                    case 1: rigid.push(cell, other); break;
-                    case 2: eat.push(cell, other); break;
-                    case 3: eat.push(other, cell); break;
+                    case 1: this.rigid[rigidL++] = cell; this.rigid[rigidL++] = other; break;
+                    case 2: this.eat[eatL++] = cell; this.eat[eatL++] = other; break;
+                    case 3: this.eat[eatL++] = other; this.eat[eatL++] = cell; break;
                 }
             });
         }
 
-        for (i = 0, l = rigid.length; i < l;)
-            this.resolveRigidCheck(rigid[i++], rigid[i++]);
-        for (i = 0, l = eat.length; i < l;)
-            this.resolveEatCheck(eat[i++], eat[i++]);
+        for (i = 0; i < rigidL;)
+            this.resolveRigidCheck(this.rigid[i++], this.rigid[i++]);
+        for (i = 0; i < eatL;)
+            this.resolveEatCheck(this.eat[i++], this.eat[i++]);
 
         this.largestPlayer = null;
         for (i = 0, l = this.players.length; i < l; i++) {
