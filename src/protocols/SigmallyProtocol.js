@@ -339,7 +339,9 @@ function writeCellData6(writer, source, cell, includeType, includeSize, includeP
     writer.writeUInt8(includeType ? 0 : 1); // isUpdate
     writer.writeUInt8(cell.type !== -1 ? 1 : 0); // isPlayer
     writer.writeUInt8(cell.owner?.sub ? 1 : 0);
-    writer.writeZTStringUTF8(cell.owner?.clan || '');
+    // only write clan on player cells, not ejected cells
+    if (cell.owner?.clan && cell.type === 0) writer.writeZTStringUTF8(cell.owner.clan);
+    else writer.writeUInt8(0);
 
     if (includeColor) writer.writeColor(cell.color);
     if (includeSkin) writer.writeZTStringUTF8(cell.skin);
