@@ -127,7 +127,7 @@ class PlayerBot extends Bot {
             this.splitCooldownTicks = 25;
         } else {
             const d = Math.sqrt(mouseX * mouseX + mouseY * mouseY);
-            if (d >= 0.001) {
+            if (d >= 0.1) {
                 this.mouseX = cell.x + mouseX / d * player.viewArea.w;
                 this.mouseY = cell.y + mouseY / d * player.viewArea.h;
             } else {
