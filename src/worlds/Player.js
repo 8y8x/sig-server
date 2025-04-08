@@ -158,9 +158,9 @@ class Player {
 
             const modifiedViewArea = { ...this.viewArea };
             if (!this.router.isExternal && this !== this.world.largestPlayer) {
-                modifiedViewArea.w /= 2;
-                modifiedViewArea.h /= 2;
-                modifiedViewArea.s /= 2;
+                modifiedViewArea.w /= 1.5;
+                modifiedViewArea.h /= 1.5;
+                modifiedViewArea.s /= 1.5;
             }
             this.world.finder.search(this.world.finder.bitRange(modifiedViewArea), (cell) => {
                 if (intersects(modifiedViewArea, cell.range)) visibleCells[cell.id] = cell;
