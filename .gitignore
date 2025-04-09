@@ -11,5 +11,8 @@ package-lock.json
 .vscode
 .vs
 
+# node-gyp
+build
+
 # other
 **/.DS_store

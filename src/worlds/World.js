@@ -7,7 +7,7 @@ const Pellet = require("../cells/Pellet");
 const EjectedCell = require("../cells/EjectedCell");
 const PlayerCell = require("../cells/PlayerCell");
 const Mothercell = require("../cells/Mothercell");
-const Virus = require("../cells/Virus");
+const { Virus } = require("../../ccore");
 const ChatChannel = require("../sockets/ChatChannel");
 
 const { fullyIntersects, SQRT_2 } = require("../primitives/Misc");
@@ -280,7 +280,7 @@ class World {
         }
         while (this.virusCount < this.settings.virusMinCount) {
             const pos = this.getSafeSpawnPos(this.settings.virusSize);
-            this.addCell(new Virus(this, pos.x, pos.y));
+            this.addCell(new Virus(this, pos.x, pos.y, this.settings.virusSize));
         }
         while (this.mothercellCount < this.settings.mothercellCount) {
             const pos = this.getSafeSpawnPos(this.settings.mothercellSize);
@@ -370,24 +370,24 @@ class World {
             player.updateViewArea();
         }
 
-        let playing = 0;
+        let playing = [];
         for (i = 0, l = this.players.length; i < l; i++) {
             const player = this.players[i];
             if (player.router instanceof Connection && (player.state === 0 || player.state === -1)) {
-                ++playing;
+                playing.push(player);
             }
         }
 
         let targetMinions = 0;
-        if (this.handle.settings.worldMinionsPerPlayer > 0 && this.handle.settings.worldMaxMinions > 0 && playing > 0) {
+        if (this.handle.settings.worldMinionsPerPlayer > 0 && this.handle.settings.worldMaxMinions > 0 && playing.length > 0) {
             targetMinions = Math.min(
                 this.handle.settings.worldMinionsPerPlayer,
-                Math.ceil(this.handle.settings.worldMaxMinions / playing)
+                Math.ceil(this.handle.settings.worldMaxMinions / playing.length)
             );
         }
 
-        for (i = 0, l = this.players.length; i < l; i++) {
-            const player = this.players[i];
+        for (i = 0, l = playing.length; i < l; i++) {
+            const player = playing[i];
             if (!(player.router instanceof Connection)) continue;
 
             if (player.state === 0 || player.state === -1) {
@@ -492,7 +492,7 @@ class World {
      * @param {Virus} virus
      */
     splitVirus(virus) {
-        const newVirus = new Virus(this, virus.x, virus.y);
+        const newVirus = new Virus(this, virus.x, virus.y, this.settings.virusSize);
         newVirus.boost.dx = Math.sin(virus.splitAngle);
         newVirus.boost.dy = Math.cos(virus.splitAngle);
         newVirus.boost.d = this.settings.virusSplitBoost;

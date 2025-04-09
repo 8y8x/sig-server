@@ -17,6 +17,7 @@
         "url": "https://github.com/Luka967/OgarII/issues"
     },
     "dependencies": {
+        "bindings": "^1.5.0",
         "ws": "^8.18.1"
     },
     "devDependencies": {
