@@ -11,5 +11,8 @@ package-lock.json
 .vscode
 .vs
 
+# ccore
+build
+
 # other
 **/.DS_store

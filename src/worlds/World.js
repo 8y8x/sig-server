@@ -370,24 +370,24 @@ class World {
             player.updateViewArea();
         }
 
-        let playing = 0;
+        let playing = [];
         for (i = 0, l = this.players.length; i < l; i++) {
             const player = this.players[i];
             if (player.router instanceof Connection && (player.state === 0 || player.state === -1)) {
-                ++playing;
+                playing.push(player);
             }
         }
 
         let targetMinions = 0;
-        if (this.handle.settings.worldMinionsPerPlayer > 0 && this.handle.settings.worldMaxMinions > 0 && playing > 0) {
+        if (this.handle.settings.worldMinionsPerPlayer > 0 && this.handle.settings.worldMaxMinions > 0 && playing.length > 0) {
             targetMinions = Math.min(
                 this.handle.settings.worldMinionsPerPlayer,
-                Math.ceil(this.handle.settings.worldMaxMinions / playing)
+                Math.ceil(this.handle.settings.worldMaxMinions / playing.length)
             );
         }
 
-        for (i = 0, l = this.players.length; i < l; i++) {
-            const player = this.players[i];
+        for (i = 0, l = playing.length; i < l; i++) {
+            const player = playing[i];
             if (!(player.router instanceof Connection)) continue;
 
             if (player.state === 0 || player.state === -1) {
