@@ -1,3 +1,4 @@
+#pragma once
 #include <stdlib.h>
 
 typedef struct circalloc_t {
@@ -9,7 +10,7 @@ typedef struct circalloc_t {
 	size_t pointers_back; // index of the last element to be allocated
 } circalloc_t;
 
-circalloc_t circalloc(size_t initial_capacity, size_t item_size);
+circalloc_t circalloc(size_t capacity_exponent, size_t item_size);
 void circalloc_destroy(circalloc_t* ca);
 void* circalloc_alloc(circalloc_t* ca);
 void circalloc_free(circalloc_t* ca, void* item);

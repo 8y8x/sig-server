@@ -4,11 +4,6 @@ const ServerHandle = require("../src/ServerHandle");
 const { genCommand } = require("../src/commands/CommandList");
 const readline = require("readline");
 
-{
-    const ccore = require("../ccore");
-    console.log(ccore);
-}
-
 const DefaultCommands = require("../src/commands/DefaultCommands");
 const DefaultProtocols = [
     require("../src/protocols/SigmallyProtocol"),

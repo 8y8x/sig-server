@@ -3,20 +3,22 @@
 
 #include "circalloc.h"
 
-circalloc_t circalloc(size_t initial_capacity, size_t item_size) {
-	void* items = malloc(item_size * initial_capacity);
-	void** pointers = malloc(sizeof(size_t) * initial_capacity);
+circalloc_t circalloc(size_t capacity_exponent, size_t item_size) {
+	size_t capacity = 1 << capacity_exponent;
+	void* data = malloc(item_size * capacity);
+	void** pointers = malloc(sizeof(void*) * capacity);
 
-	for (size_t i = 0; i < initial_capacity; ++i) {
-		pointers[i] = items + i * item_size;
+	for (size_t i = 0; i < capacity; ++i) {
+		pointers[i] = data + i * item_size;
 	}
 
-	circalloc_t ca = { pointers, items, item_size, initial_capacity - 1, 0, initial_capacity - 1 };
+	circalloc_t ca = { pointers, data, item_size, capacity - 1, 0, capacity - 1 };
 	return ca;
 }
 
 void circalloc_destroy(circalloc_t* ca) {
-	free(ca->pointers); // ->items is stored after ->pointers in the same block
+	free(ca->data);
+	free(ca->pointers);
 }
 
 void* circalloc_alloc(circalloc_t* ca) {

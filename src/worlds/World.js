@@ -1,4 +1,4 @@
-const BitGrid = require("../primitives/BitGrid");
+const { BitGrid } = require("../ccore/index");
 
 const Minion = require("../bots/Minion");
 const PlayerBot = require("../bots/PlayerBot");
@@ -7,7 +7,7 @@ const Pellet = require("../cells/Pellet");
 const EjectedCell = require("../cells/EjectedCell");
 const PlayerCell = require("../cells/PlayerCell");
 const Mothercell = require("../cells/Mothercell");
-const { Virus } = require("../../ccore");
+const Virus = require("../cells/Virus");
 const ChatChannel = require("../sockets/ChatChannel");
 
 const { fullyIntersects, SQRT_2 } = require("../primitives/Misc");
@@ -197,8 +197,7 @@ class World {
      * @param {Rect} range
      */
     isSafeSpawnPos(range) {
-        const bitRange = this.finder.bitRange(range);
-        return !this.finder.containsAny(bitRange, /** @param {Cell} other */ (item) => item.avoidWhenSpawning);
+        return !this.finder.containsAny(range, /** @param {Cell} other */ (item) => item.avoidWhenSpawning);
     }
     /**
      * @param {number} cellSize
@@ -263,6 +262,7 @@ class World {
 
     liveUpdate() {
         this.handle.gamemode.onWorldTick(this);
+        this.finder.clean?.();
 
         /** @type {number} */
         let i;
@@ -297,7 +297,7 @@ class World {
         for (i = 0; i < l; i++) {
             const cell = this.boostingCells[i];
             if (cell.type !== 2 && cell.type !== 3) continue;
-            this.finder.search(cell.bitRange, (other) => {
+            this.finder.search(cell.range, (other) => {
                 if (cell.id === other.id) return;
                 switch (cell.getEatResult(other)) {
                     case 1: this.rigid[rigidL++] = cell; this.rigid[rigidL++] = other; break;
@@ -318,7 +318,7 @@ class World {
 
         for (i = 0, l = this.playerCells.length; i < l; i++) {
             const cell = this.playerCells[i];
-            this.finder.search(cell.bitRange, (other) => {
+            this.finder.search(cell.range, (other) => {
                 if (cell.id === other.id) return;
                 switch (cell.getEatResult(other)) {
                     case 1: this.rigid[rigidL++] = cell; this.rigid[rigidL++] = other; break;

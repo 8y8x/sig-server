@@ -164,17 +164,15 @@ class Player {
                 modifiedViewArea.s /= 2;
             }
             let anyPellets = false;
-            this.world.finder.search(this.world.finder.bitRange(modifiedViewArea), (cell) => {
-                if (intersects(modifiedViewArea, cell.range)) {
-                    visibleCells[cell.id] = cell;
-                    anyPellets ||= cell.type === 1;
-                }
+            this.world.finder.search(modifiedViewArea, (cell) => {
+                visibleCells[cell.id] = cell;
+                anyPellets ||= cell.type === 1;
             });
 
             if (!anyPellets && !this.router.isExternal && this !== this.world.largestPlayer) {
                 // if PlayerBots can't find any nearby pellets, it's probably strayed off the wrong path
-                this.world.finder.search(this.world.finder.bitRange(this.viewArea), (cell) => {
-                    if (intersects(modifiedViewArea, cell.range)) visibleCells[cell.id] = cell;
+                this.world.finder.search(this.viewArea, (cell) => {
+                    visibleCells[cell.id] = cell;
                 });
             }
         }
