@@ -441,8 +441,8 @@ NAPI_CALLBACK(bitgrid_search) {
 			for (int32_t i = 0; i < tile->next_item; ++i) {
 				if (!tile->items[i]) continue;
 				// don't process items twice
-				if ((bg_range.left < tile->items[i]->bg_range.left && tile->items[i]->bg_range.left < x) ||
-					(bg_range.top < tile->items[i]->bg_range.top && tile->items[i]->bg_range.top < y)) continue;
+				if ((bg_range.left <= tile->items[i]->bg_range.left && tile->items[i]->bg_range.left < x) ||
+					(bg_range.top <= tile->items[i]->bg_range.top && tile->items[i]->bg_range.top < y)) continue;
 				if (!rect_intersects(rect, tile->items[i]->rect)) continue;
 
 				napi_value js_object, return_val;

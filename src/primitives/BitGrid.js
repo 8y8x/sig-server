@@ -1,4 +1,6 @@
-const { clampBits } = require("../primitives/Misc");
+const { clampBits, intersects } = require("../primitives/Misc");
+
+const bitRangeKey = Symbol();
 
 /** @template {{ range: Rect, bitRange?: BitRange }} T */
 class BitGrid {
@@ -22,16 +24,16 @@ class BitGrid {
 
 		return {
 			leftmost: clampBits(Math.floor(leftmostBit)),
-			rightmost: clampBits(Math.floor(rightmostBit)),
+			rightmost: clampBits(Math.ceil(rightmostBit)),
 			topmost: clampBits(Math.floor(topmostBit)),
-			bottommost: clampBits(Math.floor(bottommostBit))
+			bottommost: clampBits(Math.ceil(bottommostBit))
 		};
 	}
 
 	/** @param {T} item */
 	insert(item) {
 		const bitRange = this.bitRange(item.range);
-		item.bitRange = bitRange;
+		item[bitRangeKey] = bitRange;
 		for (let x = bitRange.leftmost; x <= bitRange.rightmost; x++) {
 			for (let y = bitRange.topmost; y <= bitRange.bottommost; y++) {
 				this.tiles[y * 32 + x].add(item);
@@ -42,8 +44,8 @@ class BitGrid {
 	/** @param {T} item */
 	update(item) {
 		const bitRange = this.bitRange(item.range);
-		const oldBitRange = item.bitRange;
-		item.bitRange = bitRange;
+		const oldBitRange = item[bitRangeKey];
+		item[bitRangeKey] = bitRange;
 
 		// trim item from old tiles
 		for (let x = oldBitRange.leftmost; x < bitRange.leftmost; x++) {
@@ -57,12 +59,12 @@ class BitGrid {
 			}
 		}
 		for (let y = oldBitRange.topmost; y < bitRange.topmost; y++) {
-			for (let x = oldBitRange.leftmost; x <= oldBitRange.rightmost; ++x) {
+			for (let x = oldBitRange.leftmost; x <= oldBitRange.rightmost; x++) {
 				this.tiles[y * 32 + x].delete(item);
 			}
 		}
 		for (let y = oldBitRange.bottommost; y > bitRange.bottommost; y--) {
-			for (let x = oldBitRange.leftmost; x <= oldBitRange.rightmost; ++x) {
+			for (let x = oldBitRange.leftmost; x <= oldBitRange.rightmost; x++) {
 				this.tiles[y * 32 + x].delete(item);
 			}
 		}
@@ -92,27 +94,32 @@ class BitGrid {
 
 	/** @param {T} item */
 	remove(item) {
-		const { leftmost, rightmost, topmost, bottommost } = item.bitRange;
+		const { leftmost, rightmost, topmost, bottommost } = item[bitRangeKey];
 		for (let x = leftmost; x <= rightmost; x++) {
 			for (let y = topmost; y <= bottommost; y++) {
 				this.tiles[y * 32 + x].delete(item);
 			}
 		}
+		delete item[bitRangeKey];
 	}
 
 	/**
-	 * @param {BitRange} bitRange
+	 * @param {Range} bitRange
 	 * @param {(item: T) => void} callback
 	 */
-	search(bitRange, callback) {
-		const { leftmost, rightmost, topmost, bottommost } = bitRange;
+	search(range, callback, fast) {
+		const { leftmost, rightmost, topmost, bottommost } = this.bitRange(range);
 		for (let x = leftmost; x <= rightmost; x++) {
 			for (let y = topmost; y <= bottommost; y++) {
-				for (const item of this.tiles[y * 32 + x].values()) {
+				for (const item of this.tiles[y * 32 + x]) {
 					// don't process items more than once
-					if ((leftmost <= item.bitRange.leftmost && item.bitRange.leftmost < x)
-							|| (topmost <= item.bitRange.topmost && item.bitRange.topmost < y)) continue;
-					callback(item);
+					if (!item[bitRangeKey]) {
+						// this happens very rarely, and i'm not sure why, but this is a temporary fix
+						this.tiles[y * 32 + x].delete(item);
+					}
+					if ((leftmost <= item[bitRangeKey].leftmost && item[bitRangeKey].leftmost < x)
+							|| (topmost <= item[bitRangeKey].topmost && item[bitRangeKey].topmost < y)) continue;
+					if (fast || intersects(item.range, range)) callback(item);
 				}
 			}
 		}
@@ -126,7 +133,7 @@ class BitGrid {
 		const { leftmost, rightmost, topmost, bottommost } = this.bitRange(range);
 		for (let x = leftmost; x <= rightmost; x++) {
 			for (let y = topmost; y <= bottommost; y++) {
-				for (const item of this.tiles[y * 32 + x].values()) {
+				for (const item of this.tiles[y * 32 + x]) {
 					if (intersects(item.range, range) && (!selector || selector(item))) return true;
 				}
 			}
