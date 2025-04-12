@@ -371,11 +371,15 @@ class World {
             player.updateViewArea();
         }
 
-        let playing = [];
+        const notPlaying = [];
+        const playing = [];
         for (i = 0, l = this.players.length; i < l; i++) {
             const player = this.players[i];
-            if (player.router instanceof Connection && (player.state === 0 || player.state === -1)) {
+            if (player.router instanceof Connection && (player.state === 0 || player.state === 1) &&
+                    player.leaderboardName !== null) {
                 playing.push(player);
+            } else {
+                notPlaying.push(player);
             }
         }
 
@@ -391,14 +395,15 @@ class World {
             const player = playing[i];
             if (!(player.router instanceof Connection)) continue;
 
-            if (player.state === 0 || player.state === -1) {
-                for (let j = player.router.minions.length - 1; j >= targetMinions; j--)
-                    player.router.minions[j].close();
-                for (let j = player.router.minions.length; j < targetMinions; j++)
-                    new Minion(player.router);
-            } else {
-                while (player.router.minions.length > 0) player.router.minions[0].close();
-            }
+           for (let j = player.router.minions.length - 1; j >= targetMinions; j--)
+                player.router.minions[j].close();
+            for (let j = player.router.minions.length; j < targetMinions; j++)
+                new Minion(player.router);
+        }
+
+        for (i = 0, l = notPlaying.length; i < l; i++) {
+            const player = notPlaying[i];
+            while (player.router.minions.length > 0) player.router.minions[0].close();
         }
 
         this.compileStatistics();
