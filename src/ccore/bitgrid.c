@@ -392,8 +392,8 @@ NAPI_CALLBACK(bitgrid_remove) {
 	};
 	NAPI_OK(napi_define_properties(env, js_range, sizeof(range_props) / sizeof(napi_property_descriptor), range_props));
 
-	for (int32_t x = 0; x <= bg->tiles_per_line - 1; ++x) {
-		for (int32_t y = 0; y <= bg->tiles_per_line - 1; ++y) {
+	for (int32_t x = item->bg_range.left; x <= item->bg_range.right; ++x) {
+		for (int32_t y = item->bg_range.top; y <= item->bg_range.bottom; ++y) {
 			bitgrid_tile_remove(&bg->tiles[y * bg->tiles_per_line + x], item);
 		}
 	}
