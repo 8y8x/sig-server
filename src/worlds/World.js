@@ -375,8 +375,8 @@ class World {
         const playing = [];
         for (i = 0, l = this.players.length; i < l; i++) {
             const player = this.players[i];
-            if (player.router instanceof Connection && (player.state === 0 || player.state === 1) &&
-                    player.leaderboardName !== null) {
+            if (!(player.router instanceof Connection)) continue;
+            if ((player.state === 0 || player.state === 1) && player.leaderboardName !== null) {
                 playing.push(player);
             } else {
                 notPlaying.push(player);
@@ -393,9 +393,7 @@ class World {
 
         for (i = 0, l = playing.length; i < l; i++) {
             const player = playing[i];
-            if (!(player.router instanceof Connection)) continue;
-
-           for (let j = player.router.minions.length - 1; j >= targetMinions; j--)
+            for (let j = player.router.minions.length - 1; j >= targetMinions; j--)
                 player.router.minions[j].close();
             for (let j = player.router.minions.length; j < targetMinions; j++)
                 new Minion(player.router);
