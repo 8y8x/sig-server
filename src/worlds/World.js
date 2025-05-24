@@ -1,5 +1,4 @@
-const { BitGrid } = require("../ccore/index");
-// const BitGrid = require("../primitives/BitGrid");
+const BitGrid = require("../ccore/index").BitGrid || require("../primitives/BitGrid");
 
 const Minion = require("../bots/Minion");
 const PlayerBot = require("../bots/PlayerBot");
@@ -11,7 +10,7 @@ const Mothercell = require("../cells/Mothercell");
 const Virus = require("../cells/Virus");
 const ChatChannel = require("../sockets/ChatChannel");
 
-const { fullyIntersects, SQRT_2 } = require("../primitives/Misc");
+const { fullyIntersects } = require("../primitives/Misc");
 
 /**
  * @implements {Spawner}
