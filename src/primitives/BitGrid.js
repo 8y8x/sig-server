@@ -47,9 +47,6 @@ class BitGrid {
 		const oldBitRange = item[bitRangeKey];
 		item[bitRangeKey] = bitRange;
 
-		console.log('old:', oldBitRange);
-		console.log('new:', bitRange);
-
 		const biggerBitRange = {
 			leftmost: Math.min(bitRange.leftmost, oldBitRange.leftmost),
 			rightmost: Math.max(bitRange.rightmost, oldBitRange.rightmost),
