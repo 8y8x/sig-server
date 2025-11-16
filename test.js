@@ -1,4 +1,20 @@
-const { clampBits, intersects } = require("../primitives/Misc");
+/**
+ * @param {number} x
+ */
+function clampBits(x) {
+    return Math.min(Math.max(x, 0), 31);
+};
+
+/**
+ * @param {Rect} a
+ * @param {Rect} b
+ */
+function intersects(a, b) {
+    return a.x - a.w <= b.x + b.w &&
+        a.x + a.w >= b.x - b.w &&
+        a.y - a.h <= b.y + b.h &&
+        a.y + a.h >= b.y - b.h;
+};
 
 const bitRangeKey = Symbol();
 
@@ -97,7 +113,6 @@ class BitGrid {
 						console.log('!item[bitRangeKey] triggered!!!!!');
 						// this happens very rarely, and i'm not sure why, but this is a temporary fix
 						this.tiles[y * 32 + x].delete(item);
-						continue;
 					}
 					if ((leftmost <= item[bitRangeKey].leftmost && item[bitRangeKey].leftmost < x)
 							|| (topmost <= item[bitRangeKey].topmost && item[bitRangeKey].topmost < y)) continue;
@@ -116,12 +131,6 @@ class BitGrid {
 		for (let x = leftmost; x <= rightmost; x++) {
 			for (let y = topmost; y <= bottommost; y++) {
 				for (const item of this.tiles[y * 32 + x]) {
-					if (!item[bitRangeKey]) {
-						console.log('!item[bitRangeKey] triggered!!!!! 22');
-						// this happens very rarely, and i'm not sure why, but this is a temporary fix
-						this.tiles[y * 32 + x].delete(item);
-						continue;
-					}
 					if (intersects(item.range, range) && (!selector || selector(item))) return true;
 				}
 			}
@@ -131,4 +140,10 @@ class BitGrid {
 	}
 }
 
-module.exports = BitGrid;
+const bg = new BitGrid({ x: 0, y: 0, w: 17071, h: 17071 });
+
+const cell = { range: { x: 0, y: 0, w: 50, h: 50 }};
+bg.insert(cell);
+console.log(bg.tiles.map(x => x.size).join(' '));
+
+const p = () => console.log(bg.tiles.map(x => x.size).join(' '));

@@ -11,6 +11,7 @@ class EjectedCell extends Cell {
     constructor(world, owner, x, y, color) {
         const size = world.settings.ejectedSize;
         super(world, x, y, size, color);
+        this.name = " ";
         this.owner = owner;
     }
 

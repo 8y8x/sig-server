@@ -135,7 +135,7 @@ NAPI_CALLBACK(bitgrid_constructor) {
 	bg->rect = rect;
 	bg->tiles_per_line = 32;
 
-	bg->item_ca = circalloc(16, sizeof(bitgrid_item_t));
+	bg->item_ca = circalloc(19, sizeof(bitgrid_item_t));
 	bg->tiles = malloc(bg->tiles_per_line * bg->tiles_per_line * sizeof(bitgrid_tile_t));
 	for (int32_t i = 0; i < bg->tiles_per_line * bg->tiles_per_line; ++i) {
 		bg->tiles[i].max_items = 128;

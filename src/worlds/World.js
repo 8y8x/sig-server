@@ -1,4 +1,4 @@
-const BitGrid = require("../ccore/index").BitGrid || require("../primitives/BitGrid");
+const BitGrid = /*require("../ccore/index").BitGrid ||*/ require("../primitives/BitGrid");
 
 const Minion = require("../bots/Minion");
 const PlayerBot = require("../bots/PlayerBot");
@@ -304,7 +304,7 @@ class World {
                     case 2: this.eat[eatL++] = cell; this.eat[eatL++] = other; break;
                     case 3: this.eat[eatL++] = other; this.eat[eatL++] = cell; break;
                 }
-            }, true);
+            });
         }
 
         for (i = 0, l = this.playerCells.length; i < l; i++) {
